@@ -1,53 +1,38 @@
-import re
-import sys
-import math
-
-f = open("input.txt", "r")
+f = open('inputFinal.txt', 'r')
 lines = f.readlines()
-orders = [*lines[0][0:len(lines[0])-1]]
-datas = lines[2:len(lines)]
-steps = 0
-sys.setrecursionlimit(10000000)
 
-cleanData = {}
-
-def calculStepValue(steps):
-    reste = steps % len(orders)
-    return orders[reste]
+def defineEquart(numeros, listIteration):
+    nextRange = list()
+    for i in range(1, len(numeros)):
+        nextRange.append(int(numeros[i])-int(numeros[i-1]))
+    listIteration.append(nextRange)
+    if max(nextRange) == 0 and min(nextRange) == 0:
+        return
+    else :
+        defineEquart(nextRange, listIteration)
+allIteration = list()        
+for line in lines:
+    numeros = line.replace('\n', '').split(' ')
+    numeros = [int(x) for x in numeros]
+    listIteration = list()
+    listIteration.append(numeros)
+    defineEquart(numeros, listIteration)
+    allIteration.append(listIteration)
     
-#AAA -> BBB -> AAA -> BBB -> AAA -> BBB -> ZZZ
-#     L  ->  L  ->  R  ->  L  ->  L  ->  R
-def calculPath(index: str, steps):
-    if index[2] == 'Z':
-        print('Index ',index,' trouvé en ', steps, ' steps')
-        return steps
-    #
-    #next_order = calculStepValue(steps)
-    stepOrder = calculStepValue(steps)
-    #print(index, ' -> ', stepOrder, ' Steps:', steps)
-    steps += 1
-    if stepOrder == 'R':
-        return calculPath(cleanData[index][1],steps)
-    elif stepOrder == 'L':
-        return calculPath(cleanData[index][0],steps)
 
-def getDatasEndByA():
-    cleanDataByA = {}
-    for data in datas:
-        allPath = re.findall('[A-Z0-9]{3}', data)
-        if [*allPath[0]][2] == 'A':
-            cleanDataByA[allPath[0]] = allPath[1:3]
-    return cleanDataByA
-
-for data in datas:
-    allPath = re.findall('[A-Z0-9]{3}', data)
-    cleanData[allPath[0]] = allPath[1:3]
-
-cleanDataByA = getDatasEndByA()
-answer = []
-for key in cleanDataByA.keys():
-    answer.append(calculPath(key, 0))
+for iteration in allIteration:
+    iteration.reverse()
+    sum = 0
+    for line in iteration:
+        lastValue = line[0]
+        sum = lastValue - sum
+        line.insert(0,sum)
 
 
-ppmc = math.lcm(*answer)
-print(ppmc)
+total = 0
+for iteration in allIteration:
+    iteration.reverse()
+    calcul = iteration[0][0]
+    total += calcul
+    
+print(total)
