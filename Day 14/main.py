@@ -1,3 +1,4 @@
+import numpy as np
 D = open('input.txt').read().strip()
 L = D.split('\n')
 legth = 100
@@ -25,7 +26,7 @@ def convert_in_cols(array):
     # Créez une liste vide pour chaque colonne
     columns = [[] for _ in range(num_columns)]
     # Parcourez chaque ligne et chaque caractère pour remplir les colonnes
-    for line in L:
+    for line in array:
         for col_idx, char in enumerate(line):
             columns[col_idx].append(char)
     return columns
@@ -48,8 +49,8 @@ def calcul_score(lines):
         count_total += nb_O * (legth-i)
     return count_total
 
-for i in range(1, 1000000000):
-    columns = convert_in_cols(L)
+def North_gravity(array):
+    columns = convert_in_cols(array)
     columns_final = list()
     # Affichez le contenu de chaque colonne
     for col_idx, column in enumerate(columns):
@@ -57,5 +58,73 @@ for i in range(1, 1000000000):
         columns_final.append(falling_line)
 
     lines = convert_in_row(columns_final)
-    count_total = calcul_score(lines)
-    print(i)
+    return lines
+
+def west_gravity(array):
+    columns_final = list()
+    # Affichez le contenu de chaque colonne
+    for col_idx, column in enumerate(array):
+        falling_line = fall_rocks(array[col_idx])
+        columns_final.append(falling_line)
+    return columns_final
+
+def south_gravity(array):
+    columns = convert_in_cols(array)
+    columns_reverse = [sous_liste[::-1] for sous_liste in columns]
+    columns_final = list()
+    # Affichez le contenu de chaque colonne
+    for col_idx, column in enumerate(columns_reverse):
+        falling_line = fall_rocks(columns_reverse[col_idx])
+        columns_final.append(falling_line)
+
+    columns_reverse_reverse = [sous_liste[::-1] for sous_liste in columns_final]
+    lines = convert_in_row(columns_reverse_reverse)
+    return lines
+
+def east_gravity(array):
+    columns_reverse = [sous_liste[::-1] for sous_liste in array]
+    columns_final = list()
+    # Affichez le contenu de chaque colonne
+    for col_idx, column in enumerate(columns_reverse):
+        falling_line = fall_rocks(columns_reverse[col_idx])
+        columns_final.append(falling_line)
+    columns_reverse_reverse = [sous_liste[::-1] for sous_liste in columns_final]
+    lines = columns_reverse_reverse
+    return lines
+
+
+def display_array(array):
+    for i in range(legth):
+        for y in range(legth):
+            print(array[i][y], end='')
+        print()
+    print('\n')
+
+lines = L.copy()
+
+
+tableau1 = np.array(L)
+
+for i in range(1000000):
+    if i % 500 == 0:
+        print(i)
+    lines = North_gravity(lines)
+    tableau2 = np.array(lines)
+    if np.array_equal(tableau1, tableau2):
+        break
+    lines = west_gravity(lines)
+    tableau2 = np.array(lines)
+    if np.array_equal(tableau1, tableau2):
+        break
+    lines = south_gravity(lines)
+    tableau2 = np.array(lines)
+    if np.array_equal(tableau1, tableau2):
+        break
+    lines = east_gravity(lines)
+    tableau2 = np.array(lines)
+    if np.array_equal(tableau1, tableau2):
+        break
+
+
+count_total = calcul_score(lines)
+print(count_total)
