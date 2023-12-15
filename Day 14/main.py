@@ -1,4 +1,4 @@
-import numpy as np
+
 D = open('input.txt').read().strip()
 L = D.split('\n')
 legth = 100
@@ -100,31 +100,45 @@ def display_array(array):
         print()
     print('\n')
 
+def format_array(array):
+    val = ''
+    for i in array:
+        val += ''.join(i)
+        val += '\n'
+    return val
+
+def sont_identiques(liste1, liste2):
+    flag = False
+    for i in range(len(liste1)):
+        for y in range(len(liste1[0])):
+            if liste1[i][y] != liste2[i][y]:
+                return False
+    return True
+
 lines = L.copy()
 
-
-tableau1 = np.array(L)
-
-for i in range(1000000):
-    if i % 500 == 0:
-        print(i)
+history = list()
+for i in range(1000000001):
     lines = North_gravity(lines)
-    tableau2 = np.array(lines)
-    if np.array_equal(tableau1, tableau2):
-        break
+    if i == 0:
+        print('Part 1:', calcul_score(lines))
     lines = west_gravity(lines)
-    tableau2 = np.array(lines)
-    if np.array_equal(tableau1, tableau2):
-        break
     lines = south_gravity(lines)
-    tableau2 = np.array(lines)
-    if np.array_equal(tableau1, tableau2):
-        break
     lines = east_gravity(lines)
-    tableau2 = np.array(lines)
-    if np.array_equal(tableau1, tableau2):
-        break
+    str_array = format_array(lines)
+    if str_array in history:
+        #print('Previous', history.index(str_array), ' actual', i)
+        calcul = (1000000000-i) // (i-history.index(str_array))
+        #print(calcul)
+        calcul = calcul * (i-history.index(str_array)) + i
+        #print(calcul)
+        diff = 1000000000 - calcul
+        index_final = history.index(str_array) + diff
+        #print(index_final)
+        lines = history[index_final-1]
+        break 
+    
+    history.append(str_array)
 
-
-count_total = calcul_score(lines)
-print(count_total)
+count_total = calcul_score(lines.split('\n'))
+print('Part 2:', count_total)
